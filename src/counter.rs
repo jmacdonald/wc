@@ -8,16 +8,11 @@ pub struct Counter {
 
 impl Counter {
     pub fn new(path: &Path) -> io::Result<Counter> {
-        match File::open(&path) {
-            Ok(mut file) => {
-                let mut contents = String::new();
-                match file.read_to_string(&mut contents) {
-                    Ok(_) => Ok(Counter{ contents: contents }),
-                    Err(e) => Err(e)
-                }
-            },
-            Err(e) => Err(e)
-        }
+        let mut file = File::open(&path)?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)?;
+
+        Ok(Counter{ contents: contents })
     }
 
     pub fn words(&self) -> usize {
