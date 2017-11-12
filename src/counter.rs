@@ -24,3 +24,17 @@ impl Counter {
         word_count
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Counter;
+    use std::path::Path;
+
+    #[test]
+    fn words_returns_the_correct_number_of_words_in_the_specified_path_contents() {
+        let path = Path::new("tests/sample_file");
+        let counter = Counter::new(&path);
+
+        assert_eq!(counter.words(), 6);
+    }
+}
