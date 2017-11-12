@@ -11,9 +11,10 @@ impl Counter {
         match File::open(&path) {
             Ok(mut file) => {
                 let mut contents = String::new();
-                file.read_to_string(&mut contents).unwrap();
-
-                Ok(Counter{ contents: contents })
+                match file.read_to_string(&mut contents) {
+                    Ok(_) => Ok(Counter{ contents: contents }),
+                    Err(e) => Err(e)
+                }
             },
             Err(e) => Err(e)
         }
@@ -45,6 +46,14 @@ mod tests {
     #[test]
     fn words_handles_invalid_path_errors() {
         let path = Path::new("non-existent");
+        let counter = Counter::new(&path);
+
+        assert!(counter.is_err());
+    }
+
+    #[test]
+    fn words_handles_invalid_file_contents() {
+        let path = Path::new("tests/invalid_file");
         let counter = Counter::new(&path);
 
         assert!(counter.is_err());
