@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::Read;
+use std::io::{self, Read};
 use std::path::Path;
 
 pub struct Counter {
@@ -7,12 +7,16 @@ pub struct Counter {
 }
 
 impl Counter {
-    pub fn new(path: &Path) -> Counter {
-        let mut file = File::open(&path).unwrap();
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).unwrap();
+    pub fn new(path: &Path) -> io::Result<Counter> {
+        match File::open(&path) {
+            Ok(mut file) => {
+                let mut contents = String::new();
+                file.read_to_string(&mut contents).unwrap();
 
-        Counter{ contents: contents }
+                Ok(Counter{ contents: contents })
+            },
+            Err(e) => Err(e)
+        }
     }
 
     pub fn words(&self) -> usize {
@@ -35,6 +39,14 @@ mod tests {
         let path = Path::new("tests/sample_file");
         let counter = Counter::new(&path);
 
-        assert_eq!(counter.words(), 6);
+        assert_eq!(counter.unwrap().words(), 6);
+    }
+
+    #[test]
+    fn words_handles_invalid_path_errors() {
+        let path = Path::new("non-existent");
+        let counter = Counter::new(&path);
+
+        assert!(counter.is_err());
     }
 }

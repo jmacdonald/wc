@@ -10,7 +10,8 @@ fn main() {
     let path_arg = args.skip(1).nth(0).unwrap();
     let path = Path::new(&path_arg);
 
-    let counter = Counter::new(&path);
-
-    println!("{} words found", counter.words());
+    match Counter::new(&path) {
+        Ok(counter) => println!("{} words found", counter.words()),
+        Err(e) => println!("Error: {}", e),
+    }
 }
